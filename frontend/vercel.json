@@ -28,7 +28,10 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/index.html",
+      "headers": {
+        "Cache-Control": "s-maxage=0"
+      }
     }
   ]
 }
