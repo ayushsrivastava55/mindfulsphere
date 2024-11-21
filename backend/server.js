@@ -48,21 +48,29 @@ const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 const resourcesRoutes = require('./routes/resources');
 
+// Health check endpoint (before API routes)
+app.get('/health', (req, res) => {
+  console.log('Health check requested');
+  res.status(200).json({ status: 'OK', message: 'Server is running', timestamp: new Date().toISOString() });
+});
+
 // Basic route for testing
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to MindfulSphere API' });
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
-});
-
 // API routes
 const router = express.Router();
+
+// Test route for API
+router.get('/test', (req, res) => {
+  res.json({ message: 'API is working' });
+});
+
 router.use('/auth', authRoutes);
 router.use('/chat', chatRoutes);
 router.use('/resources', resourcesRoutes);
+
 app.use('/api', router);
 
 // Error handling middleware
@@ -70,7 +78,8 @@ app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ 
     error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -80,11 +89,19 @@ app.use((req, res) => {
   res.status(404).json({ 
     error: 'Not Found',
     message: `Cannot ${req.method} ${req.url}`,
-    path: req.url
+    path: req.url,
+    timestamp: new Date().toISOString()
   });
 });
 
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+// Handle server errors
+server.on('error', (error) => {
+  console.error('Server error:', error);
+});
+
+module.exports = app;
