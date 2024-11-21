@@ -18,19 +18,31 @@ app.use((req, res, next) => {
 // MongoDB connection state
 let isConnected = false;
 
-// MongoDB connection function
-const connectDB = async () => {
+// MongoDB connection function with retry
+const connectDB = async (retryCount = 0) => {
   if (isConnected) return;
 
+  const maxRetries = 3;
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
+    console.log('MongoDB URI:', process.env.MONGODB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
+    
     isConnected = true;
-    console.log('MongoDB Connected');
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    
+    if (retryCount < maxRetries) {
+      console.log(`Retrying connection... Attempt ${retryCount + 1} of ${maxRetries}`);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retrying
+      return connectDB(retryCount + 1);
+    }
+    
     throw error;
   }
 };
@@ -51,12 +63,15 @@ app.get('/test', async (req, res) => {
     res.json({ 
       message: 'Test endpoint working',
       dbStatus: 'Connected',
+      dbHost: mongoose.connection.host,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
+    console.error('Test endpoint error:', error);
     res.status(500).json({
       error: 'Database connection failed',
       message: error.message,
+      details: error.toString(),
       timestamp: new Date().toISOString()
     });
   }
@@ -72,12 +87,15 @@ router.get('/test', async (req, res) => {
     res.json({ 
       message: 'API route working',
       dbStatus: 'Connected',
+      dbHost: mongoose.connection.host,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
+    console.error('API test endpoint error:', error);
     res.status(500).json({
       error: 'Database connection failed',
       message: error.message,
+      details: error.toString(),
       timestamp: new Date().toISOString()
     });
   }
@@ -91,6 +109,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ 
     error: 'Internal server error',
     message: err.message,
+    details: err.toString(),
     timestamp: new Date().toISOString()
   });
 });
