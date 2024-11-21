@@ -10,21 +10,33 @@ node_modules/
 .env.test.local
 .env.production.local
 
-# Build files
+# Build outputs
 /build
 /dist
+.next
+.vercel
 
-# Debug logs
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# IDE files
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# Misc
+*.pem
+.vercel
