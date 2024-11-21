@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindfulSphere - Mental Health Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <span class="font-semibold text-gray-500 text-lg">MindfulSphere</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <a href="/resources" class="py-2 px-4 text-gray-500 hover:text-gray-700">Resources</a>
+                        <a href="#" class="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <!-- Replace with your content -->
+                <div class="px-4 py-6 sm:px-0">
+                    <div class="border-4 border-dashed border-gray-200 rounded-lg p-4">
+                        <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">Welcome to MindfulSphere</h1>
+                        <p class="text-gray-600 mb-6 text-center">Share your thoughts and feelings, and receive supportive guidance.</p>
+                        
+                        <div id="chat-container" class="space-y-4 mb-4 h-96 overflow-y-auto"></div>
+                        
+                        <div class="flex space-x-2">
+                            <input type="text" id="user-input" 
+                                   class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                   placeholder="Type your message here...">
+                            <button onclick="sendMessage()" 
+                                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- /End replace -->
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
