@@ -27,6 +27,11 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Test route
+router.get('/test', (req, res) => {
+    res.json({ message: 'Chat route is working' });
+});
+
 // Start or continue chat
 router.post('/', auth, async (req, res) => {
     try {
@@ -82,7 +87,7 @@ router.post('/', auth, async (req, res) => {
         return res.json({ message: aiResponse });
 
     } catch (error) {
-        console.error('Server Error:', error);
+        console.error('Chat Error:', error);
         res.status(500).json({ 
             message: 'An error occurred while processing your message.',
             error: error.message 
@@ -99,13 +104,13 @@ router.get('/history', auth, async (req, res) => {
         const chats = await Chat.find({ user: userId })
             .sort({ createdAt: -1 })
             .limit(1);
-            
+
         console.log('Found chats:', chats.length);
         res.json(chats);
     } catch (error) {
-        console.error('Chat history error:', error);
+        console.error('History Error:', error);
         res.status(500).json({ 
-            message: 'Error fetching chat history', 
+            message: 'Error fetching chat history',
             error: error.message 
         });
     }

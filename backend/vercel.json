@@ -9,19 +9,23 @@
   "routes": [
     {
       "src": "/api/auth/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
     },
     {
       "src": "/api/chat/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
     },
     {
       "src": "/api/resources/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
+    },
+    {
+      "src": "/health",
+      "dest": "/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/server.js"
     }
   ],
   "env": {
