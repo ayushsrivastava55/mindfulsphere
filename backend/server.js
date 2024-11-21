@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const OpenAI = require('openai');
-const path = require('path');
 
 const app = express();
 
@@ -30,17 +29,50 @@ app.use((req, res, next) => {
   next();
 });
 
+// Basic route for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to MindfulSphere API' });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    env: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Test route
+app.get('/test', (req, res) => {
+  res.json({ 
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/mindfulsphere', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected) return;
+
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = true;
+    console.log('MongoDB Connected');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error;
+  }
+};
 
 // OpenAI configuration
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Routes
@@ -48,23 +80,21 @@ const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 const resourcesRoutes = require('./routes/resources');
 
-// Health check endpoint (before API routes)
-app.get('/health', (req, res) => {
-  console.log('Health check requested');
-  res.status(200).json({ status: 'OK', message: 'Server is running', timestamp: new Date().toISOString() });
-});
-
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to MindfulSphere API' });
-});
-
 // API routes
 const router = express.Router();
 
-// Test route for API
-router.get('/test', (req, res) => {
-  res.json({ message: 'API is working' });
+// Ensure database connection before handling API routes
+router.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ 
+      error: 'Database connection failed',
+      message: 'Unable to connect to database'
+    });
+  }
 });
 
 router.use('/auth', authRoutes);
@@ -94,14 +124,12 @@ app.use((req, res) => {
   });
 });
 
-const port = process.env.PORT || 5000;
-const server = app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-// Handle server errors
-server.on('error', (error) => {
-  console.error('Server error:', error);
-});
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 5000;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
 
 module.exports = app;
