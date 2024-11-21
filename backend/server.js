@@ -7,20 +7,13 @@ const OpenAI = require('openai');
 const app = express();
 
 // CORS configuration
-const corsOptions = {
-  origin: [
-    'https://frontend-63tcztaw5-ayushsrivastava55s-projects.vercel.app',
-    'https://frontend-e4lvbnifb-ayushsrivastava55s-projects.vercel.app',
-    'http://localhost:3000'
-  ],
+app.use(cors({
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Middleware
-app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB connection
@@ -41,14 +34,20 @@ const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 const resourcesRoutes = require('./routes/resources');
 
-app.use('/api/auth', authRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/resources', resourcesRoutes);
+// Basic route for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to MindfulSphere API' });
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
+  res.json({ status: 'OK', message: 'Server is running' });
 });
+
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/resources', resourcesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -59,7 +58,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Handle 404 errors
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Not Found',
+    message: `Cannot ${req.method} ${req.url}`,
+    path: req.url
+  });
+});
+
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
