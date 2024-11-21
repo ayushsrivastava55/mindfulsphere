@@ -8,8 +8,23 @@
   ],
   "routes": [
     {
+      "src": "/api/auth/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/api/chat/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/api/resources/(.*)",
+      "dest": "server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "server.js"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
