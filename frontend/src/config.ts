@@ -10,7 +10,7 @@ export const AUTH_ENDPOINTS = {
 
 // Chat endpoints
 export const CHAT_ENDPOINTS = {
-  SEND_MESSAGE: `${API_BASE_URL}/api/chat/send`,
+  SEND_MESSAGE: `${API_BASE_URL}/api/chat`,
   GET_HISTORY: `${API_BASE_URL}/api/chat/history`,
 };
 

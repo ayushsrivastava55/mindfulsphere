@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { CHAT_ENDPOINTS } from '../config';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -44,7 +45,7 @@ const Chat: React.FC = () => {
 
   const loadChatHistory = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/chat/history`, {
+      const response = await axios.get(CHAT_ENDPOINTS.GET_HISTORY, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -84,7 +85,7 @@ const Chat: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/chat`,
+        CHAT_ENDPOINTS.SEND_MESSAGE,
         { message: input },
         {
           headers: {
@@ -130,10 +131,10 @@ const Chat: React.FC = () => {
           flex={1}
           w="100%"
           overflowY="auto"
-          borderRadius="md"
           bg="white"
+          borderRadius="lg"
           p={4}
-          boxShadow="sm"
+          boxShadow="base"
         >
           {messages && messages.length > 0 ? (
             messages.map((message, index) => (
@@ -144,10 +145,11 @@ const Chat: React.FC = () => {
               >
                 <Box
                   maxW="70%"
-                  bg={message.role === 'user' ? 'brand.500' : 'gray.100'}
+                  bg={message.role === 'user' ? 'blue.500' : 'gray.100'}
                   color={message.role === 'user' ? 'white' : 'black'}
-                  p={3}
                   borderRadius="lg"
+                  px={4}
+                  py={2}
                 >
                   <Text>{message.content}</Text>
                   <Text fontSize="xs" color={message.role === 'user' ? 'white' : 'gray.500'} mt={1}>
@@ -171,7 +173,7 @@ const Chat: React.FC = () => {
             disabled={isLoading}
           />
           <Button
-            colorScheme="brand"
+            colorScheme="blue"
             onClick={handleSend}
             isLoading={isLoading}
             loadingText="Sending..."
